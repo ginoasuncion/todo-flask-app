@@ -23,6 +23,8 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             width: 100%;
             max-width: 400px;
+            overflow-y: auto;
+            max-height: 80vh;
         }
         h1 {
             text-align: center;
@@ -81,9 +83,48 @@
             color: #d9534f;
             text-decoration: none;
             transition: color 0.3s;
+            margin-left: 10px;
         }
         a:hover {
             color: #c9302c;
+        }
+        .complete-btn {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .complete-btn:hover {
+            color: #0056b3;
+        }
+        .uncomplete-btn {
+            color: #17a2b8;
+            text-decoration: none;
+        }
+        .uncomplete-btn:hover {
+            color: #117a8b;
+        }
+        .completed {
+            text-decoration: line-through;
+            color: #888;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .pagination a {
+            color: #007bff;
+            padding: 8px 16px;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+        .pagination a:hover {
+            background-color: #ddd;
+            border-radius: 4px;
+        }
+        .pagination .active {
+            background-color: #007bff;
+            color: white;
+            border-radius: 4px;
         }
     </style>
 </head>
@@ -94,17 +135,60 @@
             <input type="text" name="todo" placeholder="Enter a new to-do item">
             <button type="submit">Add</button>
         </form>
+        <h2>Active Tasks</h2>
         <ul>
             {% for todo in todo_list %}
                 <li>
                     <div class="task-details">
                         <span>{{ todo.task }}</span>
-                        <a href="/delete/{{ loop.index0 }}">Delete</a>
+                        <div>
+                            <a class="complete-btn" href="/complete/{{ loop.index0 }}">Complete</a>
+                            <a href="/delete/{{ loop.index0 }}">Delete</a>
+                        </div>
                     </div>
                     <span class="timestamp">{{ todo.timestamp }}</span>
                 </li>
             {% endfor %}
         </ul>
-    </div>
-</body>
-</html>
+        <div class="pagination">
+            {% if active_page > 1 %}
+                <a href="{{ url_for('index', active_page=active_page-1, completed_page=completed_page) }}">&laquo; Previous</a>
+            {% endif %}
+            {% for p in range(1, total_active_pages + 1) %}
+                <a href="{{ url_for('index', active_page=p, completed_page=completed_page) }}" class="{{ 'active' if p == active_page else '' }}">{{ p }}</a>
+            {% endfor %}
+            {% if active_page < total_active_pages %}
+                <a href="{{ url_for('index', active_page=active_page+1, completed_page=completed_page) }}">Next &raquo;</a>
+            {% endif %}
+        </div>
+
+        <h2>Completed Tasks</h2>
+        <ul>
+            {% for todo in completed_todo_list %}
+                <li>
+                    <div class="task-details">
+                        <span class="completed">{{ todo.task }}</span>
+                        <div>
+                            <a class="uncomplete-btn" href="/uncomplete/{{ loop.index0 }}">Uncomplete</a>
+                            <a href="/delete_completed/{{ loop.index0 }}">Delete</a>
+                        </div>
+                    </div>
+                    <span class="timestamp">Created: {{ todo.timestamp }}</span>
+                    <span class="timestamp">Completed: {{ todo.end_timestamp }}</span>
+                </li>
+            {% endfor %}
+        </ul>
+        <div class="pagination">
+                    {% if completed_page > 1 %}
+                    <a href="{{ url_for('index', active_page=active_page, completed_page=completed_page-1) }}">&laquo; Previous</a>
+                {% endif %}
+                {% for p in range(1, total_completed_pages + 1) %}
+                    <a href="{{ url_for('index', active_page=active_page, completed_page=p) }}" class="{{ 'active' if p == completed_page else '' }}">{{ p }}</a>
+                {% endfor %}
+                {% if completed_page < total_completed_pages %}
+                    <a href="{{ url_for('index', active_page=active_page, completed_page=completed_page+1) }}">Next &raquo;</a>
+                {% endif %}
+            </div>
+        </div>
+    </body>
+    </html>
