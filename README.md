@@ -1,4 +1,4 @@
-# To Do List Application with Flask
+# To Do List Application with Flask (in progress)
 
 This is a simple to do list web application built using Flask.
 
